@@ -9,19 +9,10 @@ const { User } = require('../../../models');
  * @param {string} sortOrder - Sort order (asc or desc)
  * @returns {Promise<Array>} - Array of users
  */
-async function getUsers(pageNumber, pageSize, searchQuery, sortField, sortOrder) {
+async function getUsers(pageNumber, pageSize, search, sortField, sortOrder) {
   const skip = (pageNumber - 1) * pageSize;
 
-  let query = {};
-
-  // Apply search query if provided
-  if (searchQuery) {
-    query.email = { $regex: searchQuery, $options: 'i' }; // Case-insensitive search for email
-  }
-  //console.log(sortField, sortOrder)
-  // Apply sorting if provided
   let sort = {};
-  //if (sortField && sortOrder) sort[sortField] = sortOrder else sort[sortField] = 'desc' ? -1 : 1;
   if(sortField && sortOrder) {
     if (sortOrder == 'asc'){
       sort[sortField] = 1
@@ -29,15 +20,14 @@ async function getUsers(pageNumber, pageSize, searchQuery, sortField, sortOrder)
       sort[sortField] = -1
     }
   } else {
-    sort[email] = -1
+    sort = {'email':asc};
   }
 
-  console.log(sort)
-
   // Fetch users from database with pagination, search, and sort
-  const users = await User.find(query).sort(sort).skip(skip).limit(pageSize);
+  const users = await User.find(search).sort(sort).skip(skip).limit(pageSize);
+  const totalUsers = await User.countDocuments(search)
 
-  return users;
+  return {users, totalUsers};
 }
 
 /**

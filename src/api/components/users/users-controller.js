@@ -8,9 +8,10 @@ async function getUsers(request, response, next) {
     const searchQuery = request.query.search || '';
     const sortQuery = request.query.sort || 'email:asc';
     const [sortField, sortOrder] = sortQuery.split(':');
+    const [searchField, searchKey] = searchQuery.split(':')
 
     // Panggil getUsers dari usersService
-    const users = await usersService.getUsers(pageNumber, pageSize, searchQuery, sortField, sortOrder);
+    const users = await usersService.getUsers(pageNumber, pageSize, searchField, searchKey, sortField, sortOrder);
 
     return response.status(200).json(users);
   } catch (error) {

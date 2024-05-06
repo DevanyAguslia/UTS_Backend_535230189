@@ -10,10 +10,16 @@ const { hashPassword, passwordMatched } = require('../../../utils/password');
  * @param {string} searchKey - Keyword to search
  * @returns {Object} - Object containing paginated user data
  */
-async function getUsers(pageNumber, pageSize, searchQuery, sortField, sortOrder) {
+async function getUsers(pageNumber, pageSize, searchField, searchKey, sortField, sortOrder) {
   try {
     // Get users based on pagination, search, and sorting criteria
-    const users = await usersRepository.getUsers(pageNumber, pageSize, searchQuery === 'email' || searchQuery === 'name' ? searchQuery : '', sortField,sortOrder);
+    let search = {}
+    if(searchField && searchKey){
+      let searchReg = new RegExp(searchKey, 'i');
+      search[searchField] = searchReg;
+    }
+
+    const {users, totalUsers} = await usersRepository.getUsers(pageNumber, pageSize, search, sortField, sortOrder);
 
     // Get total count of users for pagination
     //const totalUsers = await usersRepository.countUsers(searchKey, '');
